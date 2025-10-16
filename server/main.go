@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/zshstacks/markdown-zsh/initializers"
+	"github.com/zshstacks/markdown-zsh/routes"
 )
 
 func init() {
@@ -17,6 +18,11 @@ func init() {
 
 func main() {
 	e := echo.New()
+	e.Use(middleware.Recover())
+	e.Use(middleware.Logger())
+	e.Use(middleware.Secure())
+
+	routes.AuthRoutes(e)
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     []string{"http://localhost:8000", "http://localhost:3000"},
