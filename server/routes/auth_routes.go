@@ -1,15 +1,14 @@
 package routes
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
+	"github.com/zshstacks/markdown-zsh/controllers"
 )
 
 func AuthRoutes(e *echo.Echo) {
 	AuthGroup := e.Group("/")
 	{
-		AuthGroup.GET("logout", func(c echo.Context) error { return c.String(http.StatusOK, "logout") })
+		AuthGroup.POST("register", controllers.Register)
 	}
 
 }
