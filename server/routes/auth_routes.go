@@ -9,6 +9,7 @@ func AuthRoutes(e *echo.Echo) {
 	AuthGroup := e.Group("/")
 	{
 		AuthGroup.POST("register", controllers.Register)
+		AuthGroup.POST("login", controllers.Login)
 	}
 
 }
