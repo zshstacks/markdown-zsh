@@ -10,6 +10,8 @@ func AuthRoutes(e *echo.Echo) {
 	{
 		AuthGroup.POST("register", controllers.Register)
 		AuthGroup.POST("login", controllers.Login)
+		AuthGroup.POST("auth/refresh", controllers.Refresh)
+		AuthGroup.POST("auth/refresh/logout", controllers.Logout)
 	}
 
 }
