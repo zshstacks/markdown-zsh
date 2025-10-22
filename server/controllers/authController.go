@@ -3,7 +3,6 @@ package controllers
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -102,7 +101,6 @@ func Register(c echo.Context) error {
 func Refresh(c echo.Context) error {
 	cookie, err := c.Cookie("refresh_token")
 	if err != nil {
-		fmt.Println("refresh_token cookie not found:", err)
 		return echo.NewHTTPError(http.StatusUnauthorized, "Refresh token missing")
 	}
 

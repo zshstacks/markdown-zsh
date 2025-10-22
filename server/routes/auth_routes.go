@@ -6,12 +6,12 @@ import (
 )
 
 func AuthRoutes(e *echo.Echo) {
-	AuthGroup := e.Group("/")
+	Public := e.Group("/")
 	{
-		AuthGroup.POST("register", controllers.Register)
-		AuthGroup.POST("login", controllers.Login)
-		AuthGroup.POST("auth/refresh", controllers.Refresh)
-		AuthGroup.POST("auth/refresh/logout", controllers.Logout)
+		Public.POST("register", controllers.Register)
+		Public.POST("login", controllers.Login)
+		Public.POST("auth/refresh", controllers.Refresh)
+		Public.POST("auth/refresh/logout", controllers.Logout)
 	}
 
 }
