@@ -32,6 +32,7 @@ func RequireAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			// check if error is due to expired token
 			if errors.Is(err, jwt.ErrTokenExpired) {
+
 				// token expired ,try refresh
 				claims, err = helpers.TryRefresh(c)
 				if err != nil {

@@ -10,6 +10,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/zshstacks/markdown-zsh/config"
 	"github.com/zshstacks/markdown-zsh/initializers"
 	"github.com/zshstacks/markdown-zsh/models"
 )
@@ -58,7 +59,7 @@ func TryRefresh(c echo.Context) (claims *JWTClaims, err error) {
 		TokenHash: newHashStr,
 		UserID:    user.ID,
 		IssuedAt:  time.Now(),
-		ExpiresAt: time.Now().Add(7 * 24 * time.Hour),
+		ExpiresAt: time.Now().Add(time.Duration(config.App.JWT.RefreshTokenTTL) * 24 * time.Hour),
 	}
 
 	if err := initializers.DB.Create(&newRefresh).Error; err != nil {
@@ -79,20 +80,20 @@ func TryRefresh(c echo.Context) (claims *JWTClaims, err error) {
 		Name:     "token",
 		Value:    accessToken,
 		Path:     "/",
-		MaxAge:   15 * 60,
+		MaxAge:   config.App.JWT.AccessTokenTTL * 60,
 		HttpOnly: true,
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
+		Secure:   config.App.Cookie.Secure,
+		SameSite: config.App.Cookie.SameSite,
 	})
 
 	c.SetCookie(&http.Cookie{
 		Name:     "refresh_token",
 		Value:    newTokenID + "." + newSecret,
 		Path:     "/",
-		MaxAge:   7 * 24 * 60 * 60,
+		MaxAge:   config.App.JWT.RefreshTokenTTL * 24 * 60 * 60,
 		HttpOnly: true,
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
+		Secure:   config.App.Cookie.Secure,
+		SameSite: config.App.Cookie.SameSite,
 	})
 
 	claims = &JWTClaims{
@@ -100,7 +101,7 @@ func TryRefresh(c echo.Context) (claims *JWTClaims, err error) {
 		UID: user.UniqueID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(config.App.JWT.AccessTokenTTL) * time.Minute)),
 		},
 	}
 

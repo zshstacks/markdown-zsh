@@ -1,19 +1,22 @@
 package main
 
 import (
-	"net/http"
+	"fmt"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/zshstacks/markdown-zsh/config"
 	"github.com/zshstacks/markdown-zsh/initializers"
 	"github.com/zshstacks/markdown-zsh/routes"
 )
 
 func init() {
 	initializers.LoadEnvVariables()
+	config.Init()
 	initializers.ConnectToDB()
 	initializers.SyncDatabase()
+
 }
 
 func main() {
@@ -25,13 +28,18 @@ func main() {
 	routes.AuthRoutes(e)
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{"http://localhost:8000", "http://localhost:3000"},
-		AllowMethods:     []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
-		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowOrigins:     config.App.CORS.AllowedOrigins,
+		AllowMethods:     config.App.CORS.AllowedMethods,
+		AllowHeaders:     config.App.CORS.AllowedHeaders,
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           int((24 * time.Hour) / time.Millisecond),
 	}))
 
-	e.Logger.Fatal(e.Start(":8000"))
+	e.Server.ReadTimeout = time.Duration(config.App.Server.ReadTimeout) * time.Second
+	e.Server.WriteTimeout = time.Duration(config.App.Server.WriteTimeout) * time.Second
+
+	port := fmt.Sprintf(":%s", config.App.Server.Port)
+
+	e.Logger.Fatal(e.Start(port))
 }

@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/zshstacks/markdown-zsh/config"
 )
 
 func VerifyAccessToken(tokenStr string) (*JWTClaims, error) {
@@ -12,18 +13,15 @@ func VerifyAccessToken(tokenStr string) (*JWTClaims, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(os.Getenv("JWT_SECRET")), nil
+		return []byte(os.Getenv(config.App.JWT.Secret)), nil
 	})
+
 	if err != nil {
 		return nil, err
 	}
 
 	claims, ok := token.Claims.(*JWTClaims)
-	if !ok {
-		return nil, fmt.Errorf("invalid claims type")
-	}
-
-	if !token.Valid {
+	if !ok || !token.Valid {
 		return nil, fmt.Errorf("invalid token")
 	}
 

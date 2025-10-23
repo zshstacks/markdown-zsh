@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/zshstacks/markdown-zsh/config"
 	"github.com/zshstacks/markdown-zsh/helpers"
 	"github.com/zshstacks/markdown-zsh/initializers"
 	"github.com/zshstacks/markdown-zsh/models"
@@ -140,7 +141,7 @@ func Refresh(c echo.Context) error {
 		TokenHash: newHashStr,
 		UserID:    user.ID,
 		IssuedAt:  time.Now(),
-		ExpiresAt: time.Now().Add(7 * 24 * time.Hour),
+		ExpiresAt: time.Now().Add(time.Duration(config.App.JWT.RefreshTokenTTL) * 24 * time.Hour),
 	}
 
 	if err := initializers.DB.Create(&newRefresh).Error; err != nil {
@@ -163,20 +164,20 @@ func Refresh(c echo.Context) error {
 		Name:     "token",
 		Value:    accessToken,
 		Path:     "/",
-		MaxAge:   15 * 60,
+		MaxAge:   config.App.JWT.AccessTokenTTL * 60,
 		HttpOnly: true,
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
+		Secure:   config.App.Cookie.Secure,
+		SameSite: config.App.Cookie.SameSite,
 	})
 
 	c.SetCookie(&http.Cookie{
 		Name:     "refresh_token",
 		Value:    newTokenID + "." + newSecret,
 		Path:     "/",
-		MaxAge:   7 * 24 * 60 * 60,
+		MaxAge:   config.App.JWT.RefreshTokenTTL * 24 * 60 * 60,
 		HttpOnly: true,
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
+		Secure:   config.App.Cookie.Secure,
+		SameSite: config.App.Cookie.SameSite,
 	})
 
 	return c.JSON(http.StatusOK, map[string]string{
@@ -212,10 +213,10 @@ func Login(c echo.Context) error {
 		Name:     "token",
 		Value:    accessToken,
 		Path:     "/",
-		MaxAge:   15 * 60,
+		MaxAge:   config.App.JWT.AccessTokenTTL * 60,
 		HttpOnly: true,
-		Secure:   false, //  true in production HTTPS
-		SameSite: http.SameSiteLaxMode,
+		Secure:   config.App.Cookie.Secure,
+		SameSite: config.App.Cookie.SameSite,
 	})
 
 	//create refresh token
@@ -228,7 +229,7 @@ func Login(c echo.Context) error {
 		TokenHash: hex.EncodeToString(hash[:]),
 		UserID:    user.ID,
 		IssuedAt:  time.Now(),
-		ExpiresAt: time.Now().Add(7 * 24 * time.Hour),
+		ExpiresAt: time.Now().Add(time.Duration(config.App.JWT.RefreshTokenTTL) * 24 * time.Hour),
 	}
 	if err := initializers.DB.Create(&refresh).Error; err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create refresh token")
@@ -240,8 +241,8 @@ func Login(c echo.Context) error {
 		Path:     "/",
 		MaxAge:   7 * 24 * 60 * 60,
 		HttpOnly: true,
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
+		Secure:   config.App.Cookie.Secure,
+		SameSite: config.App.Cookie.SameSite,
 	})
 
 	resp := struct {
@@ -280,8 +281,8 @@ func Logout(c echo.Context) error {
 		Path:     "/",
 		MaxAge:   -1,
 		HttpOnly: true,
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
+		Secure:   config.App.Cookie.Secure,
+		SameSite: config.App.Cookie.SameSite,
 	})
 	c.SetCookie(&http.Cookie{
 		Name:     "token",
@@ -289,9 +290,15 @@ func Logout(c echo.Context) error {
 		Path:     "/",
 		MaxAge:   -1,
 		HttpOnly: true,
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
+		Secure:   config.App.Cookie.Secure,
+		SameSite: config.App.Cookie.SameSite,
 	})
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "Logged out"})
+}
+
+func Profile(c echo.Context) error {
+	return c.JSON(http.StatusOK, map[string]string{
+		"message": "This is profile",
+	})
 }
