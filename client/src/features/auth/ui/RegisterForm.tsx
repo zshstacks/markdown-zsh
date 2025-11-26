@@ -21,6 +21,7 @@ import { AppDispatch, RootState } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "@/redux/authSlice/asyncActions";
 import { useRouter } from "next/navigation";
+import { clearAuthErrors } from "@/redux/authSlice/authSlice";
 
 interface ValidateErrors {
   password?: string;
@@ -73,6 +74,8 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
       default:
         break;
     }
+
+    dispatch(clearAuthErrors());
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,6 +85,13 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
       setValidateErrors({
         password: "Passwords do not match",
         "confirm-password": "Passwords do not match",
+      });
+      return;
+    }
+
+    if (password.length < 8) {
+      setValidateErrors({
+        password: "Password must be at least 8 characters",
       });
       return;
     }
@@ -162,7 +172,9 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
                   {passwordError}
                 </FieldDescription>
               ) : (
-                <FieldDescription>
+                <FieldDescription
+                  className={`${passwordError ? "text-red-600" : ""}`}
+                >
                   Must be at least 8 characters long.
                 </FieldDescription>
               )}
@@ -193,7 +205,7 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
             <FieldGroup>
               <Field>
                 {globalError && (
-                  <FieldDescription className="text-red-600 text-center">
+                  <FieldDescription className="text-red-600 ">
                     {globalError}
                   </FieldDescription>
                 )}
@@ -205,9 +217,7 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
                 >
                   {isSubmiting ? "Creating Account..." : "Create Account"}
                 </Button>
-                <Button variant="outline" type="button">
-                  Sign up with Google
-                </Button>
+
                 <FieldDescription className="px-6 text-center">
                   Already have an account? <Link href="/login">Sign in</Link>
                 </FieldDescription>

@@ -1,6 +1,6 @@
 import { AuthState } from "../../../utility/types/reduxTypes";
 import { createSlice } from "@reduxjs/toolkit";
-import { registerUser } from "@/redux/authSlice/asyncActions";
+import { loginUser, registerUser } from "@/redux/authSlice/asyncActions";
 
 const initialState: AuthState = {
   isLoading: false,
@@ -11,9 +11,28 @@ const initialState: AuthState = {
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    clearAuthErrors: (state) => {
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
+
+      .addCase(loginUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+        state.user = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -30,4 +49,5 @@ const authSlice = createSlice({
   },
 });
 
+export const { clearAuthErrors } = authSlice.actions;
 export default authSlice.reducer;

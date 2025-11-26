@@ -16,3 +16,15 @@ export const registerUser = createAsyncThunk(
     }
   },
 );
+
+export const loginUser = createAsyncThunk(
+  "auth/loginUser",
+  async (userData: { email: string; password: string }, thunkAPI) => {
+    try {
+      const res = await api.post("/login", userData);
+      return res.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue("Login failed");
+    }
+  },
+);
