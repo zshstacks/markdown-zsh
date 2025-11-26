@@ -18,7 +18,7 @@ func AuthRoutes(e *echo.Echo) {
 	Private := e.Group("/user")
 	Private.Use(middleware.RequireAuth)
 	{
-		Private.GET("/profile", controllers.Profile)
+		Private.GET("/current", controllers.GetCurrentUser)
 	}
 
 }

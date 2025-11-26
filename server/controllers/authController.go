@@ -297,8 +297,14 @@ func Logout(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"message": "Logged out"})
 }
 
-func Profile(c echo.Context) error {
-	return c.JSON(http.StatusOK, map[string]string{
-		"message": "This is profile",
-	})
+func GetCurrentUser(c echo.Context) error {
+	user := c.Get("user")
+
+	userModel, ok := user.(models.User)
+
+	if !ok {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve user")
+	}
+
+	return c.JSON(http.StatusOK, userModel)
 }

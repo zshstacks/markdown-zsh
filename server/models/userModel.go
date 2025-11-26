@@ -9,7 +9,7 @@ type User struct {
 	UniqueID              string `gorm:"uniqueIndex;size:12;not null"`
 	Email                 string `gorm:"uniqueIndex;size:40;not null"`
 	Username              string `gorm:"size:30"`
-	Password              string `gorm:"not null"`
+	Password              string `gorm:"not null" json:"-"`
 	IsEmailConfirmed      bool   `gorm:"default:false"`
-	EmailConfirmationCode string `gorm:"size:64"`
+	EmailConfirmationCode string `gorm:"size:64" json:"-"`
 }
