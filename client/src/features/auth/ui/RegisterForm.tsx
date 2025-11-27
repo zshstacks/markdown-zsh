@@ -30,7 +30,7 @@ interface ValidateErrors {
   [key: string]: string | undefined;
 }
 
-export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
+function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

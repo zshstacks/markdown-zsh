@@ -24,10 +24,7 @@ import { useRouter } from "next/navigation";
 import { loginUser } from "@/redux/authSlice/asyncActions";
 import { clearAuthErrors } from "@/redux/authSlice/authSlice";
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 

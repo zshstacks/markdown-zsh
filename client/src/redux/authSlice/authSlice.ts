@@ -1,9 +1,13 @@
-import { AuthState } from "../../../utility/types/reduxTypes";
+import { AuthState } from "@/utility/types/reduxTypes";
 import { createSlice } from "@reduxjs/toolkit";
-import { loginUser, registerUser } from "@/redux/authSlice/asyncActions";
+import {
+  loadUser,
+  loginUser,
+  registerUser,
+} from "@/redux/authSlice/asyncActions";
 
 const initialState: AuthState = {
-  isLoading: false,
+  isLoading: true,
   error: null,
   user: null,
 };
@@ -19,6 +23,7 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
 
+      //login
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -33,6 +38,7 @@ const authSlice = createSlice({
         state.error = action.payload as string;
       })
 
+      //register
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -43,6 +49,21 @@ const authSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(registerUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+
+      //get data
+      .addCase(loadUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+        state.user = null;
+      })
+      .addCase(loadUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+      })
+      .addCase(loadUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       });

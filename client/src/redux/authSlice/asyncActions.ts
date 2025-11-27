@@ -28,3 +28,15 @@ export const loginUser = createAsyncThunk(
     }
   },
 );
+
+export const loadUser = createAsyncThunk(
+  "auth/loadUser",
+  async (_, thunkAPI) => {
+    try {
+      const res = await api.get("/user/current");
+      return res.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to load user data.");
+    }
+  },
+);
