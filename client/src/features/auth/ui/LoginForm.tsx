@@ -27,6 +27,7 @@ import { clearAuthErrors } from "@/redux/authSlice/authSlice";
 function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
 
   const auth = useSelector((state: RootState) => state.auth);
   const dispatch: AppDispatch = useDispatch();
@@ -49,17 +50,19 @@ function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    setIsFormSubmitting(true);
+
     const userData = { email, password };
     const result = await dispatch(loginUser(userData));
 
     if (result.type === "auth/loginUser/fulfilled") {
       router.push("/markdown");
+      setIsFormSubmitting(false);
     } else {
       console.log("Login failed: ", result.payload);
+      setIsFormSubmitting(false);
     }
   };
-
-  const isSubmitting = auth.isLoading;
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -113,9 +116,9 @@ function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
                 <Button
                   type="submit"
                   className="cursor-pointer"
-                  disabled={isSubmitting}
+                  disabled={isFormSubmitting}
                 >
-                  {isSubmitting ? "Logging in..." : "Login"}
+                  {isFormSubmitting ? "Logging in..." : "Login"}
                 </Button>
                 <Button
                   variant="outline"

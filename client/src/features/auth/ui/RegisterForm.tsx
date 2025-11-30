@@ -36,6 +36,7 @@ function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [validateErrors, setValidateErrors] = useState<ValidateErrors>({});
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
 
   const dispatch: AppDispatch = useDispatch();
   const auth = useSelector((state: RootState) => state.auth);
@@ -81,11 +82,14 @@ function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    setIsFormSubmitting(true);
+
     if (password !== confirmPassword) {
       setValidateErrors({
         password: "Passwords do not match",
         "confirm-password": "Passwords do not match",
       });
+      setIsFormSubmitting(false);
       return;
     }
 
@@ -93,6 +97,7 @@ function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
       setValidateErrors({
         password: "Password must be at least 8 characters",
       });
+      setIsFormSubmitting(false);
       return;
     }
 
@@ -104,16 +109,16 @@ function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
     if (result.type === "auth/registerUser/fulfilled") {
       clearForm();
       router.push("/login");
+      setIsFormSubmitting(false);
     } else {
       console.log("Register error: ", result.payload);
+      setIsFormSubmitting(false);
     }
   };
 
   const passwordError = validateErrors.password;
   const confirmPasswordError = validateErrors["confirm-password"];
   const globalError = auth.error;
-
-  const isSubmiting = auth.isLoading;
 
   return (
     <Card {...props}>
@@ -212,10 +217,10 @@ function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
 
                 <Button
                   type="submit"
-                  disabled={isSubmiting}
+                  disabled={isFormSubmitting}
                   className="cursor-pointer"
                 >
-                  {isSubmiting ? "Creating Account..." : "Create Account"}
+                  {isFormSubmitting ? "Creating Account..." : "Create Account"}
                 </Button>
 
                 <FieldDescription className="px-6 text-center">
